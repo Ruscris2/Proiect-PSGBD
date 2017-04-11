@@ -1,0 +1,40 @@
+.profile_box{
+	height: 300px;
+	margin-left: 100px;
+	margin-top: 50px;
+	margin-right: 100px;
+	background-color: white;
+	box-shadow: 1px 1px 5px lightgray;
+}
+
+.box_header{
+	height: 60px;
+	background-color: dodgerblue;
+	box-shadow: 0px 3px 2px lightgray;
+}
+
+h1{
+	margin: 0;
+	font-family: sans-serif;
+	font-size: 24px;
+	color: white;
+
+	margin-left: 10px;
+	padding-top: 15px;
+}
+
+.profile_content{
+	margin-top: 25px;
+	margin-left: 40px;
+}
+
+p{
+	font-family: "Myriad Arabic";
+	font-size: 20px;
+	margin: 5px;
+}
+
+.profile_info{
+	position: absolute;
+	margin-left: 300px;
+}

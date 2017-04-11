@@ -36,10 +36,6 @@ p{
 	margin-bottom: 10px;
 }
 
-.display_flex{
-	display: flex;
-}
-
 .login_form{
 	margin-left: 115px;
 	margin-top: 50px;
@@ -69,9 +65,9 @@ input{
 }
 
 .login_btn:hover{
-	background-color: #90c5f9;
+	background-color: ghostwhite;
 }
 
 .login_btn:active{
-	background-color: #54afd9;
+	background-color: lightgrey;
 }

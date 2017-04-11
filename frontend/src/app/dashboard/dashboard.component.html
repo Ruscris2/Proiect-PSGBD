@@ -1,4 +1,9 @@
-<button (click)="onLogoutClick()">Logout</button>
-<p>
-  dashboard works!
-</p>
+<div class="page_content">
+	<div class="topbar">
+		<a routerLink="/"><h3>Bus Subscription App</h3></a>
+		<div class="topbar_btn" (click)="onLogoutClick()"><p>Logout</p></div>
+		<a routerLink="/profile"><div class="topbar_btn"><p>Account</p></div></a>
+		<p class="userinfo">{{firstname}} {{lastname}}</p>
+	</div>
+</div>
+<router-outlet></router-outlet>

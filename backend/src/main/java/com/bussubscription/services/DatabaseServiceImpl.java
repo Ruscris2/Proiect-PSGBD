@@ -1,5 +1,6 @@
 package com.bussubscription.services;
 
+import com.bussubscription.models.UserinfoResponse;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
@@ -34,7 +35,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public boolean validateLogin(String username, String password) {
         try {
-            queryResult = stmt.executeQuery("SELECT password FROM angajati WHERE username = '" + username + "'");
+            queryResult = stmt.executeQuery("SELECT password FROM angajati WHERE username = '" + prepareStrForQuery(username) + "'");
 
             if(!queryResult.next())
                 return false;
@@ -48,6 +49,39 @@ public class DatabaseServiceImpl implements DatabaseService {
             System.err.println("Unforeseen exception: " + e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public UserinfoResponse getUserInfo(String username){
+        try {
+            queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp FROM angajati WHERE username = '" + prepareStrForQuery(username) + "'");
+
+            queryResult.next();
+
+            UserinfoResponse output = new UserinfoResponse();
+            output.nume = queryResult.getString(1);
+            output.prenume = queryResult.getString(2);
+            output.email = queryResult.getString(3);
+            output.cnp = queryResult.getString(4);
+            return output;
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private String prepareStrForQuery(String str){
+        String output = "";
+        for(int i = 0; i < str.length(); i++){
+            if(str.charAt(i) == '\''){
+                output += "\'\'";
+            }
+            else
+                output += str.charAt(i);
+        }
+
+        return output;
     }
 
     @Override

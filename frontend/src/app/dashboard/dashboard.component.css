@@ -1,0 +1,55 @@
+.topbar{
+	height: 50px;
+	background-color: white;
+	box-shadow: 1px 1px 5px lightgray;
+}
+
+.page_content{
+	position: relative;
+}
+
+.topbar_btn{
+	float: right;
+	margin-top: 7px;
+	border: 1px solid lightgray;
+	margin-right: 15px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.topbar_btn p{
+	margin: 0;
+	padding: 8px;
+	color: black;
+}
+
+.topbar_btn:hover{
+	background-color: ghostwhite;
+}
+
+.topbar_btn:active{
+	background-color: lightgray;
+}
+
+.userinfo{
+	margin: 0;
+	float: right;
+	margin-right: 20px;
+	font-family: "Myriad Arabic";
+	font-size: 26px;
+	margin-top: 10px;
+	color: #3A3A3A;
+	user-select: none;
+}
+
+h3{
+	margin: 0;
+	margin-left: 40px;
+	padding-top: 10px;
+	font-family: "Myriad Arabic";
+	font-size: 30px;
+	color: #3A3A3A;
+	position: absolute;
+	user-select: none;
+	cursor: pointer;
+}

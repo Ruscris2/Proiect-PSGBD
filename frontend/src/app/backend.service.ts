@@ -13,4 +13,12 @@ export class BackendService {
 		headers.append('Content-Type', 'application/json');
 		return this.http.post('http://localhost:6969/login', json, { headers: headers }).map(res => res.json());
 	}
+
+	getUserInfo(username: string){
+		var headers = new Headers();
+		var json = JSON.stringify({ username: username});
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/userinfo', json, { headers: headers }).map(res => res.json());
+	}
 }
