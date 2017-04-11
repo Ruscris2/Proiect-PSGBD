@@ -1,0 +1,16 @@
+<div class="login_box">
+	<div class="login_header">
+		<h1>Login</h1>
+	</div>
+	<div class="login_form">
+		<div class="display_flex">
+			<p>Username:</p>
+			<input id="userTextBox" type="text" (change)="onInputChange($event)">
+		</div>
+		<div class="display_flex">
+			<p>Password:</p>
+			<input id="passTextBox" type="password" (change)="onInputChange($event)">
+		</div>
+		<div class="login_btn" (click)="onLoginClick()"><p>Login</p></div>
+	</div>
+</div>
