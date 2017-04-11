@@ -52,7 +52,7 @@ input{
 }
 
 .login_btn{
-	border: 1px solid black;
+	border: 1px solid lightgray;
 	display: inline-block;
 	cursor: pointer;
 	text-align: center;

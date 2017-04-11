@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BackendService } from "../backend.service";
 
 @Component({
   selector: 'app-login',
@@ -10,8 +11,20 @@ export class LoginComponent {
 	username: string = '';
 	password: string = '';
 
+	constructor(private backendService: BackendService) {}
+
 	onLoginClick(){
-		alert(this.username + ' ' + this.password);
+		if(this.username == '' || this.password == ''){
+			alert('Ambele campuri trebuie sa fie completate!');
+			return;
+		}
+		
+		this.backendService.login(this.username, this.password).subscribe(
+			data => {let jsonParsed = JSON.parse(JSON.stringify(data));
+						alert(jsonParsed.authorized)},
+			error => console.log('Login failed!'),
+			() => console.log('Logged in!')
+		);
 	}
 
 	onInputChange(event: any){
