@@ -18,12 +18,15 @@ export class DashboardComponent {
 		if(user == null){
 			router.navigateByUrl('/login');
 		}
-
-		backendService.getUserInfo(user).subscribe(
-			data => { let jsonParsed = JSON.parse(JSON.stringify(data));
-						this.firstname = jsonParsed.nume;
-						this.lastname = jsonParsed.prenume},
-			error => console.log('getUserInfo() failed!'));
+		else {
+			backendService.getUserInfo(user).subscribe(
+				data => {
+					let jsonParsed = JSON.parse(JSON.stringify(data));
+					this.firstname = jsonParsed.nume;
+					this.lastname = jsonParsed.prenume
+				},
+				error => console.log('getUserInfo() failed!'));
+		}
 	}
 
 	onLogoutClick(){

@@ -1,0 +1,51 @@
+.sidebar{
+	margin-left: 50px;
+	margin-top: 25px;
+	width: 200px;
+	height: 500px;
+	background-color: white;
+	float: left;
+	box-shadow: 1px 1px 5px lightgray;
+}
+
+.content_box{
+	margin-left: 275px;
+	margin-top: 25px;
+	margin-right: 50px;
+	height: 500px;
+	background-color: white;
+	box-shadow: 1px 1px 5px lightgray;
+}
+
+ul{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	margin-top: 10px;
+	user-select: none;
+}
+
+.heading_unselected{
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color: #2F2F2F;
+	font-family: "Myriad Arabic";
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.heading_unselected:hover{
+	background-color: lightblue;
+}
+
+.heading_selected{
+	background-color: dodgerblue;
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color: white;
+	font-family: "Myriad Arabic";
+	font-size: 16px;
+	cursor: pointer;
+}

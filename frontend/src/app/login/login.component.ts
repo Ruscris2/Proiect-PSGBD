@@ -32,7 +32,7 @@ export class LoginComponent {
 							this.router.navigateByUrl('');
 						}
 						else
-							alert('Username sau parola invalida!')},
+							alert('Invalid username or password!')},
 			error => console.log('Login failed!'),
 			() => console.log('Logged in!')
 		);

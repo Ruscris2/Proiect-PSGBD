@@ -1,3 +1,12 @@
-<p>
-  workpanel works!
-</p>
+<div class="sidebar">
+	<ul>
+		<li	*ngFor="let item of sidebarItems; let i = index"
+			   [ngClass]="{ 'heading_selected':item.selected, 'heading_unselected':!item.selected }"
+			   (click)="onHeadingClick(i)">{{item.name}}</li>
+	</ul>
+</div>
+<div class="content_box">
+	<div class="box_header">
+		<h1>{{sidebarItems[selectedItem].name}}</h1>
+	</div>
+</div>
