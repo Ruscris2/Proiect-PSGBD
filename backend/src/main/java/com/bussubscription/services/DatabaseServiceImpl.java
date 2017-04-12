@@ -120,7 +120,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
             // Insert into table
             stmt.executeUpdate("INSERT INTO clienti (id, nume, prenume, cnp, abonament_activ, email) VALUES " +
-                    "(" + Integer.toString(id+1) + ",'" + firstname + "','" + lastname + "','" + cnp + "',-1,'" + email + "')");
+                    "(" + Integer.toString(id+1) + ",'" + prepareStrForQuery(firstname) + "','" +
+                    prepareStrForQuery(lastname) + "','" + prepareStrForQuery(cnp) + "',-1,'" +
+                    prepareStrForQuery(email) + "')");
             response.msg = "Client inserted!";
         }
         catch (SQLException e){
@@ -148,7 +150,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public List<ClientListResponse> getClientListPage(int pagenumber, int pagesize){
+    public List<ClientListResponse> getClientListPage(int pagenumber, int pagesize, String filter){
         List<ClientListResponse> list = new LinkedList<>();
 
         Statement stmt = null;
@@ -157,11 +159,22 @@ public class DatabaseServiceImpl implements DatabaseService {
             stmt = connection.createStatement();
 
             // Make the query
-            queryResult = stmt.executeQuery("SELECT id, nume, prenume, cnp, tip, " +
-                    "TO_CHAR(inceput_abonament, 'DD-MON-YYYY'), TO_CHAR(sfarsit_abonament, 'DD-MON-YYYY'), email" +
-                    " FROM (SELECT c.*, a.tip, ROWNUM r FROM clienti c JOIN abonamente a ON c.abonament_activ=a.id)" +
-                    " WHERE r > " + Integer.toString(pagenumber-1) + "*" + Integer.toString(pagesize) + " AND r <= " +
-                    Integer.toString(pagenumber)+ "*" + Integer.toString(pagesize));
+            if(filter.length() == 0) {
+                queryResult = stmt.executeQuery("SELECT id, nume, prenume, cnp, tip, " +
+                        "TO_CHAR(inceput_abonament, 'DD-MON-YYYY'), TO_CHAR(sfarsit_abonament, 'DD-MON-YYYY'), email" +
+                        " FROM (SELECT c.*, a.tip, ROWNUM r FROM clienti c JOIN abonamente a ON c.abonament_activ=a.id)" +
+                        " WHERE r > " + Integer.toString(pagenumber - 1) + "*" + Integer.toString(pagesize) + " AND r <= " +
+                        Integer.toString(pagenumber) + "*" + Integer.toString(pagesize));
+            }
+            else
+            {
+                queryResult = stmt.executeQuery("SELECT id, nume, prenume, cnp, tip, " +
+                        "TO_CHAR(inceput_abonament, 'DD-MON-YYYY'), TO_CHAR(sfarsit_abonament, 'DD-MON-YYYY'), email" +
+                        " FROM (SELECT c.*, a.tip, ROWNUM r FROM clienti c JOIN abonamente a ON c.abonament_activ=a.id" +
+                        " WHERE c.nume LIKE '%" + filter + "%')" +
+                        " WHERE r > " + Integer.toString(pagenumber - 1) + "*" + Integer.toString(pagesize) + " AND r <= " +
+                        Integer.toString(pagenumber) + "*" + Integer.toString(pagesize));
+            }
 
             while (queryResult.next()){
                 ClientListResponse response = new ClientListResponse();

@@ -41,6 +41,10 @@
 			</div>
 		</div>
 		<div *ngIf="addClientSelectedButton==2">
+			<div class="display_flex">
+				<input id="filterTextBox" (change)="onInputChange($event)">
+				<div id="filterBtn" class="btn" (click)="onFilterClick()">Filter by name</div>
+			</div>
 			<table>
 				<thead>
 					<tr>
@@ -67,7 +71,8 @@
 			</table>
 			<div class="display_flex">
 				<div class="btn page_btn" (click)="onPrevClientPageClick()"><p>{{clientpagenumber}}</p></div>
-				<div class="btn page_btn" (click)="onNextClientPageClick()"><p>{{clientpagenumber+1}}</p></div>
+				<div class="btn page_btn" (click)="onNextClientPageClick()"
+					*ngIf="clientListPage.length==10"><p>{{clientpagenumber+1}}</p></div>
 			</div>
 		</div>
 	</div>

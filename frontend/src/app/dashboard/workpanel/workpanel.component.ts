@@ -14,7 +14,7 @@ export class WorkpanelComponent {
 		{ name: 'Fourth item here', selected: false }
 	];
 
-	clientListPage: any;
+	clientListPage: any = [];
 
 	clientpagenumber = 1;
 	selectedItem = 0;
@@ -25,6 +25,10 @@ export class WorkpanelComponent {
 	addClientLastName: string;
 	addClientCNP: string;
 	addClientEmail: string;
+
+	// Client list filter
+	currentFilter: string = '';
+	clientFilterName: string;
 
 	constructor(private backendService: BackendService) {
 		this.getClientPage();
@@ -66,6 +70,9 @@ export class WorkpanelComponent {
 		if(event.target.id == 'addClientEmailBox'){
 			this.addClientEmail = event.target.value;
 		}
+		if(event.target.id == 'filterTextBox'){
+			this.clientFilterName = event.target.value;
+		}
 	}
 
 	onRegisterClick(){
@@ -94,8 +101,14 @@ export class WorkpanelComponent {
 		this.getClientPage();
 	}
 
+	onFilterClick(){
+		this.clientpagenumber = 1;
+		this.currentFilter = this.clientFilterName;
+		this.getClientPage();
+	}
+
 	getClientPage(){
-		this.backendService.getClientListPage(this.clientpagenumber, 10).subscribe(
+		this.backendService.getClientListPage(this.clientpagenumber, 10, this.currentFilter).subscribe(
 			data => { this.clientListPage = data },
 			error => console.log('Error getting client list page!')
 		);

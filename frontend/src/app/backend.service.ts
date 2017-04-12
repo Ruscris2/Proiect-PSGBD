@@ -30,9 +30,9 @@ export class BackendService {
 		return this.http.post('http://localhost:6969/addclient', json, { headers: headers }).map(res => res.json());
 	}
 
-	getClientListPage(pagenumber: number, pagesize: number){
+	getClientListPage(pagenumber: number, pagesize: number, filter: string){
 		var headers = new Headers();
-		var json = JSON.stringify({ pagenumber: pagenumber, pagesize: pagesize });
+		var json = JSON.stringify({ pagenumber: pagenumber, pagesize: pagesize, filter: filter });
 
 		headers.append('Content-Type', 'application/json');
 		return this.http.post('http://localhost:6969/clientlist', json, { headers: headers }).map(res => res.json());

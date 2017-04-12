@@ -62,7 +62,7 @@ public class HTTPController {
     @RequestMapping(value = "/clientlist", method = RequestMethod.POST)
     public ResponseEntity<List<ClientListResponse>> getClientList(@RequestBody ClientListRequest request){
 
-        List<ClientListResponse> response = databaseService.getClientListPage(request.pagenumber, request.pagesize);
+        List<ClientListResponse> response = databaseService.getClientListPage(request.pagenumber, request.pagesize, request.filter);
 
         System.out.println("------ /clientlist ------");
         return new ResponseEntity<List<ClientListResponse>>(response, HttpStatus.OK);

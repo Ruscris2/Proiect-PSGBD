@@ -10,5 +10,5 @@ public interface DatabaseService {
     boolean validateLogin(String username, String password);
     UserinfoResponse getUserInfo(String username);
     GenericResponse insertIntoClients(String firstname, String lastname, String cnp, String email);
-    List<ClientListResponse> getClientListPage(int pagenumber, int pagesize);
+    List<ClientListResponse> getClientListPage(int pagenumber, int pagesize, String filter);
 }
