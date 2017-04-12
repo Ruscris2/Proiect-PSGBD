@@ -73,7 +73,8 @@ public class DatabaseServiceImpl implements DatabaseService {
         ResultSet queryResult = null;
         try {
             stmt = connection.createStatement();
-            queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp FROM angajati WHERE username = '" + prepareStrForQuery(username) + "'");
+            queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp FROM angajati WHERE username = '" +
+                    prepareStrForQuery(username) + "'");
 
             queryResult.next();
 
@@ -206,6 +207,103 @@ public class DatabaseServiceImpl implements DatabaseService {
         }
 
         return list;
+    }
+
+    @Override
+    public ClientListResponse getClient(String cnp){
+
+        Statement stmt = null;
+        ResultSet queryResult = null;
+        try{
+            ClientListResponse response = new ClientListResponse();
+
+            stmt = connection.createStatement();
+            queryResult = stmt.executeQuery("SELECT c.id, c.nume, c.prenume, c.cnp, a.tip, " +
+                    "TO_CHAR(c.inceput_abonament, 'DD-MON-YYYY'), TO_CHAR(c.sfarsit_abonament, 'DD-MON-YYYY'), c.email " +
+                    "FROM clienti c JOIN abonamente a ON c.abonament_activ=a.id WHERE c.cnp = '" + prepareStrForQuery(cnp) + "'");
+
+            if(!queryResult.next())
+                return null;
+
+            response.id = queryResult.getInt(1);
+            response.firstname = queryResult.getString(2);
+            response.lastname = queryResult.getString(3);
+            response.cnp = queryResult.getString(4);
+            response.abonament = queryResult.getString(5);
+            response.start = queryResult.getString(6);
+            response.end = queryResult.getString(7);
+            response.email = queryResult.getString(8);
+
+            return response;
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean removeClient(String cnp){
+        Statement stmt = null;
+        try{
+            stmt = connection.createStatement();
+
+            stmt.executeUpdate("DELETE FROM clienti WHERE cnp = '" + prepareStrForQuery(cnp) + "'");
+            return true;
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updateClient(String firstname, String lastname, String cnp, String email){
+        Statement stmt = null;
+        try{
+            stmt = connection.createStatement();
+            
+            stmt.executeUpdate("UPDATE clienti SET nume = '" + prepareStrForQuery(firstname) + "'," +
+                                "prenume = '" + prepareStrForQuery(lastname) + "'," +
+                                "email = '" + prepareStrForQuery(email) + "' WHERE cnp = '" + prepareStrForQuery(cnp) + "'");
+            return true;
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return false;
     }
 
     private String prepareStrForQuery(String str){

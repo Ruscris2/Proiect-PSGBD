@@ -37,4 +37,28 @@ export class BackendService {
 		headers.append('Content-Type', 'application/json');
 		return this.http.post('http://localhost:6969/clientlist', json, { headers: headers }).map(res => res.json());
 	}
+
+	getClient(cnp: string){
+		var headers = new Headers();
+		var json = JSON.stringify({ msg: cnp });
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/client', json, { headers: headers });
+	}
+
+	removeClient(cnp: string){
+		var headers = new Headers();
+		var json = JSON.stringify({ msg: cnp });
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/removeclient', json, { headers: headers }).map(res => res.json());
+	}
+
+	updateClient(firstname: string, lastname: string, cnp: string, email: string){
+		var headers = new Headers();
+		var json = JSON.stringify({ firstname: firstname, lastname: lastname, cnp: cnp, email: email });
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/updateclient', json, { headers: headers }).map(res => res.json());
+	}
 }

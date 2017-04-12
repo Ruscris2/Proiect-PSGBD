@@ -9,7 +9,7 @@
 	<div class="box_header">
 		<h1>{{sidebarItems[selectedItem].name}}</h1>
 	</div>
-	<!-- Clients -->
+	<!-- =======================================================Clients=========================================================== -->
 	<div *ngIf="selectedItem == 0">
 		<div class="btns">
 			<div (click)="onClientListPageClick()"
@@ -18,6 +18,8 @@
 				 [ngClass]="{ 'btn':(addClientSelectedButton!=0), 'btn_selected':(addClientSelectedButton==0)}"><p>Add Client</p></div>
 			<div (click)="onRemoveClientPageClick()"
 				 [ngClass]="{ 'btn':(addClientSelectedButton!=1), 'btn_selected':(addClientSelectedButton==1)}"><p>Remove Client</p></div>
+			<div (click)="onUpdateClientPageClick()"
+				 [ngClass]="{ 'btn':(addClientSelectedButton!=3), 'btn_selected':(addClientSelectedButton==3)}"><p>Update Client</p></div>
 		</div>
 		<div *ngIf="addClientSelectedButton==0" class="add_client_container">
 			<div class="display_flex">
@@ -40,9 +42,35 @@
 				<div id="register_btn" class="btn" (click)="onRegisterClick()"><p>Register client</p></div>
 			</div>
 		</div>
+		<div *ngIf="addClientSelectedButton==1" class="remove_client_container">
+			<div class="display_flex">
+				<p id="cnpLabel">CNP:</p>
+				<input id="removeClientTextBox" type="text" (change)="onInputChange($event)">
+				<div class="btn" id="removeClientBtn" (click)="onRemoveBtnClick()"><p>Remove</p></div>
+			</div>
+			<div *ngIf="display_client">
+				<table id="client_info_tabl">
+					<tr>
+						<td>{{removeClientId}}</td>
+						<td>{{removeClientFirstName}}</td>
+						<td>{{removeClientLastName}}</td>
+						<td>{{removeClientCNP}}</td>
+						<td>{{removeClientAbonament}}</td>
+						<td>{{removeClientStart}}</td>
+						<td>{{removeClientEnd}}</td>
+						<td>{{removeClientEmail}}</td>
+					</tr>
+				</table>
+				<p id="removeClientLabel">Are you sure you want to remove this client for the database?</p>
+				<div class="display_flex">
+					<div class="btn" (click)="onConfirmRemoveClick()"><p>Yes</p></div>
+					<div class="btn" (click)="onCancelRemoveClick()"><p>No</p></div>
+				</div>
+			</div>
+		</div>
 		<div *ngIf="addClientSelectedButton==2">
 			<div class="display_flex">
-				<input id="filterTextBox" (change)="onInputChange($event)">
+				<input id="filterTextBox" [(ngModel)]="currentFilter">
 				<div id="filterBtn" class="btn" (click)="onFilterClick()">Filter by name</div>
 			</div>
 			<table>
@@ -73,6 +101,28 @@
 				<div class="btn page_btn" (click)="onPrevClientPageClick()"><p>{{clientpagenumber}}</p></div>
 				<div class="btn page_btn" (click)="onNextClientPageClick()"
 					*ngIf="clientListPage.length==10"><p>{{clientpagenumber+1}}</p></div>
+			</div>
+		</div>
+		<div *ngIf="addClientSelectedButton==3" class="remove_client_container">
+			<div class="display_flex">
+				<p>CNP:</p>
+				<input type="text" id="updateCNPTextBox" [(ngModel)]="updateClientCNP" (change)="onUpdateCNPChange()">
+				<div id="getdatabtn" class="btn" (click)="getDataBtn()"><p>Get data by CNP</p></div>
+			</div>
+			<div class="display_flex">
+				<p>Nume:</p>
+				<input type="text" id="updateFirstNameTextBox" [(ngModel)]="updateClientFirstName">
+			</div>
+			<div class="display_flex">
+				<p>Prenume:</p>
+				<input type="text" id="updateLastNameTextBox" [(ngModel)]="updateClientLastName">
+			</div>
+			<div class="display_flex">
+				<p>Email:</p>
+				<input type="text" id="updateEmailTextBox" [(ngModel)]="updateClientEmail">
+			</div>
+			<div class="display_flex">
+				<div id="update_btn" class="btn" (click)="onUpdateClick()"><p>Update client</p></div>
 			</div>
 		</div>
 	</div>

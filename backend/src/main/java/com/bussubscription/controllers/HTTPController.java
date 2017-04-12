@@ -67,4 +67,42 @@ public class HTTPController {
         System.out.println("------ /clientlist ------");
         return new ResponseEntity<List<ClientListResponse>>(response, HttpStatus.OK);
     }
+
+    // ---------------------------------------- /CLIENT -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/client", method = RequestMethod.POST)
+    public ResponseEntity<ClientListResponse> getClient(@RequestBody GenericResponse request){
+
+        ClientListResponse response = databaseService.getClient(request.msg);
+
+        if(response == null){
+            System.out.println("------ /client - NO CONTENT ------");
+            return new ResponseEntity<ClientListResponse>(HttpStatus.NO_CONTENT);
+        }
+
+        System.out.println("------ /client ------");
+        return new ResponseEntity<ClientListResponse>(response, HttpStatus.OK);
+    }
+
+    // ---------------------------------------- /REMOVECLIENT -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/removeclient", method = RequestMethod.POST)
+    public ResponseEntity<ClientListResponse> removeClient(@RequestBody GenericResponse request){
+
+        databaseService.removeClient(request.msg);
+
+        System.out.println("------ /removeclient ------");
+        return new ResponseEntity<ClientListResponse>(HttpStatus.OK);
+    }
+
+    // ---------------------------------------- /UPDATECLIENT -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/updateclient", method = RequestMethod.POST)
+    public ResponseEntity<ClientListResponse> updateClient(@RequestBody AddClientRequest request){
+
+        databaseService.updateClient(request.firstname, request.lastname, request.cnp, request.email);
+
+        System.out.println("------ /updateclient ------");
+        return new ResponseEntity<ClientListResponse>(HttpStatus.OK);
+    }
 }

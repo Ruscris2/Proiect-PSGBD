@@ -27,10 +27,27 @@ export class WorkpanelComponent {
 	addClientEmail: string;
 
 	// Client list filter
-	currentFilter: string = '';
-	clientFilterName: string;
+	currentFilter: string;
+
+	// Remove client
+	removeClientCNP: string = '';
+	display_client: boolean = false;
+	removeClientId: number;
+	removeClientFirstName: string;
+	removeClientLastName: string;
+	removeClientAbonament: string;
+	removeClientStart: string;
+	removeClientEnd: string;
+	removeClientEmail: string;
+
+	// Update client text boxes
+	updateClientCNP: string;
+	updateClientFirstName: string;
+	updateClientLastName: string;
+	updateClientEmail: string;
 
 	constructor(private backendService: BackendService) {
+		this.currentFilter = '';
 		this.getClientPage();
 	}
 
@@ -57,6 +74,11 @@ export class WorkpanelComponent {
 		this.resetAddClientStrings();
 	}
 
+	onUpdateClientPageClick(){
+		this.addClientSelectedButton = 3;
+		this.resetAddClientStrings();
+	}
+
 	onInputChange(event: any){
 		if(event.target.id == 'addClientFNameBox'){
 			this.addClientFirstName = event.target.value;
@@ -70,8 +92,8 @@ export class WorkpanelComponent {
 		if(event.target.id == 'addClientEmailBox'){
 			this.addClientEmail = event.target.value;
 		}
-		if(event.target.id == 'filterTextBox'){
-			this.clientFilterName = event.target.value;
+		if(event.target.id == 'removeClientTextBox'){
+			this.removeClientCNP = event.target.value;
 		}
 	}
 
@@ -103,8 +125,78 @@ export class WorkpanelComponent {
 
 	onFilterClick(){
 		this.clientpagenumber = 1;
-		this.currentFilter = this.clientFilterName;
 		this.getClientPage();
+	}
+
+	onRemoveBtnClick(){
+		if(this.removeClientCNP == ''){
+			alert('Fill the CNP textbox first!');
+			return;
+		}
+
+		this.backendService.getClient(this.removeClientCNP).subscribe(
+			res => { if(res.status == 204){
+						alert('There is no client with that CNP!');
+					} else{
+						this.display_client = true;
+						let jsonParsed = JSON.parse(JSON.stringify(res.json()))
+						this.removeClientId = jsonParsed.id;
+						this.removeClientFirstName = jsonParsed.firstname;
+						this.removeClientLastName = jsonParsed.lastname;
+						this.removeClientAbonament = jsonParsed.abonament;
+						this.removeClientStart = jsonParsed.start;
+						this.removeClientEnd = jsonParsed.end;
+						this.removeClientEmail = jsonParsed.email;
+					}
+			},
+			error => console.log('Error getting client by cnp!')
+		);
+	}
+
+	onConfirmRemoveClick(){
+		this.backendService.removeClient(this.removeClientCNP).subscribe(
+			error => console.log('Error removing client!')
+		);
+		alert('Client removed from database!');
+		this.display_client = false;
+	}
+
+	onCancelRemoveClick(){
+		this.display_client = false;
+	}
+
+	onUpdateClick(){
+		if(this.updateClientFirstName == '' || this.updateClientLastName == '' || this.updateClientEmail == ''){
+			alert('All inputs must be completed!');
+			return;
+		}
+
+		this.backendService.updateClient(this.updateClientFirstName, this.updateClientLastName, this.updateClientCNP,
+			this.updateClientEmail).subscribe(
+				error => console.log('Error updating client!')
+		);
+		alert('Client was updated sucessfully!');
+	}
+
+	onUpdateCNPChange(){
+		this.updateClientFirstName = '';
+		this.updateClientLastName = '';
+		this.updateClientEmail = '';
+	}
+
+	getDataBtn(){
+		this.backendService.getClient(this.updateClientCNP).subscribe(
+			res => { if(res.status == 204){
+				alert('There is no client with that CNP!');
+			} else{
+				let jsonParsed = JSON.parse(JSON.stringify(res.json()))
+				this.updateClientFirstName = jsonParsed.firstname;
+				this.updateClientLastName = jsonParsed.lastname;
+				this.updateClientEmail = jsonParsed.email;
+			}
+			},
+			error => console.log('Error getting client by cnp!')
+		);
 	}
 
 	getClientPage(){

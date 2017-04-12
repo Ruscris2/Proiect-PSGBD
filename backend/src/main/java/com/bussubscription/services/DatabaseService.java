@@ -11,4 +11,7 @@ public interface DatabaseService {
     UserinfoResponse getUserInfo(String username);
     GenericResponse insertIntoClients(String firstname, String lastname, String cnp, String email);
     List<ClientListResponse> getClientListPage(int pagenumber, int pagesize, String filter);
+    ClientListResponse getClient(String cnp);
+    boolean removeClient(String cnp);
+    boolean updateClient(String firstname, String lastname, String cnp, String email);
 }

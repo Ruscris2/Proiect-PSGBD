@@ -91,6 +91,11 @@ ul{
 	margin-top: 25px;
 }
 
+.remove_client_container{
+	margin-left: 25px;
+	margin-top: 25px;
+}
+
 .btns{
 	display: flex;
 	margin-top: 10px;
@@ -128,6 +133,50 @@ input{
 #register_btn{
 	padding-left: 135px;
 	padding-right: 135px;
+}
+
+#update_btn{
+	padding-left: 135px;
+	padding-right: 135px;
+}
+
+#removeClientTextBox{
+	margin: 0;
+	margin-left: 45px;
+	margin-top: 2px;
+}
+
+#removeClientBtn{
+	margin: 0;
+	margin-left: 200px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#removeClientBtn p{
+	padding: 0;
+}
+
+#getdatabtn{
+	padding: 0;
+	margin: 0;
+	margin-left: 400px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#cnpLabel{
+	margin: 0;
+	margin-top: 4px;
+}
+
+#client_info_tabl{
+	margin-left: 0;
+	box-shadow: none;
+}
+
+#removeClientLabel{
+	margin-top: 20px;
 }
 
 table{
