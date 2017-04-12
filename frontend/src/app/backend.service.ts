@@ -21,4 +21,20 @@ export class BackendService {
 		headers.append('Content-Type', 'application/json');
 		return this.http.post('http://localhost:6969/userinfo', json, { headers: headers }).map(res => res.json());
 	}
+
+	addClient(firstname: string, lastname: string, cnp: string, email: string){
+		var headers = new Headers();
+		var json = JSON.stringify({ firstname: firstname, lastname: lastname, cnp: cnp, email: email });
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/addclient', json, { headers: headers }).map(res => res.json());
+	}
+
+	getClientListPage(pagenumber: number, pagesize: number){
+		var headers = new Headers();
+		var json = JSON.stringify({ pagenumber: pagenumber, pagesize: pagesize });
+
+		headers.append('Content-Type', 'application/json');
+		return this.http.post('http://localhost:6969/clientlist', json, { headers: headers }).map(res => res.json());
+	}
 }

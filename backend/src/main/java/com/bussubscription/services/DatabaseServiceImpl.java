@@ -1,24 +1,25 @@
 package com.bussubscription.services;
 
+import com.bussubscription.models.ClientListResponse;
+import com.bussubscription.models.GenericResponse;
 import com.bussubscription.models.UserinfoResponse;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+import java.util.AbstractList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class DatabaseServiceImpl implements DatabaseService {
 
     private Connection connection;
-    private Statement stmt;
-    private ResultSet queryResult;
 
     public DatabaseServiceImpl(){
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "proiect", "proiect");
-
-            stmt = connection.createStatement();
 
             System.out.println("================================");
             System.out.println("  CONNECTED TO ORACLE DATABASE  ");
@@ -34,7 +35,10 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public boolean validateLogin(String username, String password) {
+        Statement stmt = null;
+        ResultSet queryResult = null;
         try {
+            stmt = connection.createStatement();
             queryResult = stmt.executeQuery("SELECT password FROM angajati WHERE username = '" + prepareStrForQuery(username) + "'");
 
             if(!queryResult.next())
@@ -48,12 +52,27 @@ public class DatabaseServiceImpl implements DatabaseService {
         catch (SQLException e){
             System.err.println("Unforeseen exception: " + e.getMessage());
         }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+
+        }
         return false;
     }
 
     @Override
     public UserinfoResponse getUserInfo(String username){
+        Statement stmt = null;
+        ResultSet queryResult = null;
         try {
+            stmt = connection.createStatement();
             queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp FROM angajati WHERE username = '" + prepareStrForQuery(username) + "'");
 
             queryResult.next();
@@ -68,7 +87,112 @@ public class DatabaseServiceImpl implements DatabaseService {
         catch (SQLException e){
             System.err.println("Unforeseen exception: " + e.getMessage());
         }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+
+        }
         return null;
+    }
+
+    @Override
+    public GenericResponse insertIntoClients(String firstname, String lastname, String cnp, String email){
+        GenericResponse response = new GenericResponse();
+        response.msg = "Unexpected backend error!";
+
+        Statement stmt = null;
+        ResultSet queryResult = null;
+        try{
+            stmt = connection.createStatement();
+
+            // Get an id
+            queryResult = stmt.executeQuery("SELECT COUNT(*) FROM clienti");
+            queryResult.next();
+
+            int id = queryResult.getInt(1);
+
+            // Insert into table
+            stmt.executeUpdate("INSERT INTO clienti (id, nume, prenume, cnp, abonament_activ, email) VALUES " +
+                    "(" + Integer.toString(id+1) + ",'" + firstname + "','" + lastname + "','" + cnp + "',-1,'" + email + "')");
+            response.msg = "Client inserted!";
+        }
+        catch (SQLException e){
+            if(e.getMessage().contains("ORA-00001")){
+                response.msg = "Client already exists in database!";
+            }
+            else{
+                System.err.println("Unforeseen exception: " + e.getMessage());
+                response.msg = "Unexpected backend error!";
+            }
+        }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<ClientListResponse> getClientListPage(int pagenumber, int pagesize){
+        List<ClientListResponse> list = new LinkedList<>();
+
+        Statement stmt = null;
+        ResultSet queryResult = null;
+        try{
+            stmt = connection.createStatement();
+
+            // Make the query
+            queryResult = stmt.executeQuery("SELECT id, nume, prenume, cnp, tip, " +
+                    "TO_CHAR(inceput_abonament, 'DD-MON-YYYY'), TO_CHAR(sfarsit_abonament, 'DD-MON-YYYY'), email" +
+                    " FROM (SELECT c.*, a.tip, ROWNUM r FROM clienti c JOIN abonamente a ON c.abonament_activ=a.id)" +
+                    " WHERE r > " + Integer.toString(pagenumber-1) + "*" + Integer.toString(pagesize) + " AND r <= " +
+                    Integer.toString(pagenumber)+ "*" + Integer.toString(pagesize));
+
+            while (queryResult.next()){
+                ClientListResponse response = new ClientListResponse();
+                response.id = queryResult.getInt(1);
+                response.firstname = queryResult.getString(2);
+                response.lastname = queryResult.getString(3);
+                response.cnp = queryResult.getString(4);
+                response.abonament = queryResult.getString(5);
+                response.start = queryResult.getString(6);
+                response.end = queryResult.getString(7);
+                response.email = queryResult.getString(8);
+
+                list.add(response);
+            }
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return list;
     }
 
     private String prepareStrForQuery(String str){
@@ -87,8 +211,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public void finalize(){
         try {
-            queryResult.close();
-            stmt.close();
             connection.close();
 
             System.out.println("================================");

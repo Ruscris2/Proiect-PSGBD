@@ -9,4 +9,66 @@
 	<div class="box_header">
 		<h1>{{sidebarItems[selectedItem].name}}</h1>
 	</div>
+	<!-- Clients -->
+	<div *ngIf="selectedItem == 0">
+		<div class="btns">
+			<div (click)="onClientListPageClick()"
+				 [ngClass]="{ 'btn':(addClientSelectedButton!=2), 'btn_selected':(addClientSelectedButton==2)}"><p>Client List</p></div>
+			<div (click)="onAddClientPageClick()"
+				 [ngClass]="{ 'btn':(addClientSelectedButton!=0), 'btn_selected':(addClientSelectedButton==0)}"><p>Add Client</p></div>
+			<div (click)="onRemoveClientPageClick()"
+				 [ngClass]="{ 'btn':(addClientSelectedButton!=1), 'btn_selected':(addClientSelectedButton==1)}"><p>Remove Client</p></div>
+		</div>
+		<div *ngIf="addClientSelectedButton==0" class="add_client_container">
+			<div class="display_flex">
+				<p>Nume:</p>
+				<input id="addClientFNameBox" type="text" (change)="onInputChange($event)">
+			</div>
+			<div class="display_flex">
+				<p>Prenume:</p>
+				<input id="addClientLNameBox" type="text" (change)="onInputChange($event)">
+			</div>
+			<div class="display_flex">
+				<p>CNP:</p>
+				<input id="addClientCNPBox" type="text" (change)="onInputChange($event)">
+			</div>
+			<div class="display_flex">
+				<p>Email:</p>
+				<input id="addClientEmailBox" type="text" (change)="onInputChange($event)">
+			</div>
+			<div class="display_flex">
+				<div id="register_btn" class="btn" (click)="onRegisterClick()"><p>Register client</p></div>
+			</div>
+		</div>
+		<div *ngIf="addClientSelectedButton==2">
+			<table>
+				<thead>
+					<tr>
+						<td>ID</td>
+						<td>Nume</td>
+						<td>Prenume</td>
+						<td>CNP</td>
+						<td>Abonament activ</td>
+						<td>Inceput abonament</td>
+						<td>Sfarsit abonament</td>
+						<td>Email</td>
+					</tr>
+				</thead>
+				<tr *ngFor="let client_entry of clientListPage">
+					<td title="{{client_entry.id}}">{{client_entry.id}}</td>
+					<td title="{{client_entry.firstname}}">{{client_entry.firstname}}</td>
+					<td title="{{client_entry.lastname}}">{{client_entry.lastname}}</td>
+					<td title="{{client_entry.cnp}}">{{client_entry.cnp}}</td>
+					<td title="{{client_entry.abonament}}">{{client_entry.abonament}}</td>
+					<td title="{{client_entry.start}}">{{client_entry.start}} </td>
+					<td title="{{client_entry.end}}">{{client_entry.end}}</td>
+					<td title="{{client_entry.email}}">{{client_entry.email}}</td>
+				</tr>
+			</table>
+			<div class="display_flex">
+				<div class="btn page_btn" (click)="onPrevClientPageClick()"><p>{{clientpagenumber}}</p></div>
+				<div class="btn page_btn" (click)="onNextClientPageClick()"><p>{{clientpagenumber+1}}</p></div>
+			</div>
+		</div>
+	</div>
 </div>

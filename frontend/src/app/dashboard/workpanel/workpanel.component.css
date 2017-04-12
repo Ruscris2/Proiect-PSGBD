@@ -49,3 +49,114 @@ ul{
 	font-size: 16px;
 	cursor: pointer;
 }
+
+.btn{
+	margin-top: 7px;
+	border: 1px solid lightgray;
+	margin-right: 15px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.btn p{
+	margin: 0;
+	padding: 8px;
+	color: black;
+}
+
+.btn:hover{
+	background-color: ghostwhite;
+}
+
+.btn:active{
+	background-color: lightgray;
+}
+
+.btn_selected{
+	margin-top: 7px;
+	border: 1px solid black;
+	margin-right: 15px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.btn_selected p{
+	margin: 0;
+	padding: 8px;
+	color: black;
+}
+
+.add_client_container{
+	margin-left: 25px;
+	margin-top: 50px;
+}
+
+.btns{
+	display: flex;
+	margin-top: 10px;
+	margin-left: 20px;
+}
+
+p{
+	font-family: "Myriad Arabic";
+	font-size: 20px;
+	margin: 0;
+	margin-bottom: 15px;
+}
+
+input{
+	position: absolute;
+	margin-left: 200px;
+	margin-bottom: 15px;
+}
+
+#register_btn{
+	padding-left: 135px;
+	padding-right: 135px;
+}
+
+table{
+	width: 300px;
+	box-shadow: 1px 1px 1px lightgray;
+	margin-left: 25px;
+	margin-top: 25px;
+	margin-right: 25px;
+	table-layout: fixed;
+}
+
+tr{
+	height: 15px;
+}
+
+td{
+	border: 1px solid lightgray;
+	padding: 2px;
+	width: 125px;
+
+	overflow-x: hidden;
+	white-space: nowrap;
+	font-family: "Myriad Arabic";
+}
+
+td:nth-child(1){
+	width: 50px;
+	text-align: center;
+}
+
+thead{
+	font-family: "Myriad Arabic";
+	text-align: center;
+}
+
+.page_btn{
+	margin-left: 25px;
+	padding-left: 50px;
+	padding-right: 50px;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.page_btn p{
+	margin: 0;
+	padding: 0;
+}
