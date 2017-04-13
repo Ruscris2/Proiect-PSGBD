@@ -1,12 +1,9 @@
 package com.bussubscription.services;
 
-import com.bussubscription.models.ClientListResponse;
-import com.bussubscription.models.GenericResponse;
-import com.bussubscription.models.UserinfoResponse;
+import com.bussubscription.models.*;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
-import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +70,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         ResultSet queryResult = null;
         try {
             stmt = connection.createStatement();
-            queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp FROM angajati WHERE username = '" +
+            queryResult = stmt.executeQuery("SELECT nume, prenume, email, cnp, id FROM angajati WHERE username = '" +
                     prepareStrForQuery(username) + "'");
 
             queryResult.next();
@@ -83,6 +80,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             output.prenume = queryResult.getString(2);
             output.email = queryResult.getString(3);
             output.cnp = queryResult.getString(4);
+            output.id = queryResult.getInt(5);
             return output;
         }
         catch (SQLException e){
@@ -256,11 +254,12 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public boolean removeClient(String cnp){
-        Statement stmt = null;
+        CallableStatement stmt = null;
         try{
-            stmt = connection.createStatement();
+            stmt = connection.prepareCall("{ call client_pack.remove_client(?) }");
 
-            stmt.executeUpdate("DELETE FROM clienti WHERE cnp = '" + prepareStrForQuery(cnp) + "'");
+            stmt.setString(1, cnp);
+            stmt.execute();
             return true;
         }
         catch (SQLException e){
@@ -281,13 +280,16 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public boolean updateClient(String firstname, String lastname, String cnp, String email){
-        Statement stmt = null;
+        CallableStatement stmt = null;
         try{
-            stmt = connection.createStatement();
-            
-            stmt.executeUpdate("UPDATE clienti SET nume = '" + prepareStrForQuery(firstname) + "'," +
-                                "prenume = '" + prepareStrForQuery(lastname) + "'," +
-                                "email = '" + prepareStrForQuery(email) + "' WHERE cnp = '" + prepareStrForQuery(cnp) + "'");
+            stmt = connection.prepareCall("{ call client_pack.update_client(?, ?, ?, ?) }");
+
+            stmt.setString(1, firstname);
+            stmt.setString(2, lastname);
+            stmt.setString(3, cnp);
+            stmt.setString(4, email);
+
+            stmt.execute();
             return true;
         }
         catch (SQLException e){
@@ -304,6 +306,118 @@ public class DatabaseServiceImpl implements DatabaseService {
         }
 
         return false;
+    }
+
+    @Override
+    public List<TPointListResponse> getTPointList(){
+        List<TPointListResponse> list = new LinkedList<>();
+
+        Statement stmt = null;
+        ResultSet queryResult = null;
+        try {
+            stmt = connection.createStatement();
+
+            queryResult = stmt.executeQuery("SELECT id, adresa, oras, project_functions.best_client(id) FROM ghisee");
+            while (queryResult.next()) {
+                TPointListResponse response = new TPointListResponse();
+                response.id = queryResult.getInt(1);
+                response.address = queryResult.getString(2);
+                response.city = queryResult.getString(3);
+                response.bestclient = queryResult.getString(4);
+                list.add(response);
+            }
+
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<SubTypeResponse> getSubTypeList(){
+        List<SubTypeResponse> list = new LinkedList<>();
+
+        Statement stmt = null;
+        ResultSet queryResult = null;
+        try{
+            stmt = connection.createStatement();
+
+            queryResult = stmt.executeQuery("SELECT id, tip, pret FROM abonamente");
+            while(queryResult.next()){
+                SubTypeResponse response = new SubTypeResponse();
+
+                response.id = queryResult.getInt(1);
+                response.name = queryResult.getString(2);
+                response.price = queryResult.getInt(3);
+                list.add(response);
+            }
+        }
+        catch (SQLException e){
+            System.err.println("Unforeseen exception: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (queryResult != null)
+                    queryResult.close();
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public GenericResponse makeTransaction(String cnp, int idUser, int idSub){
+        GenericResponse response = new GenericResponse();
+        response.msg = "Unknown database error";
+
+        CallableStatement stmt = null;
+        try{
+            stmt = connection.prepareCall("{ call transaction_pack.make_transaction(?, ?, ?) }");
+
+            stmt.setString(1, cnp);
+            stmt.setInt(2, idUser);
+            stmt.setInt(3, idSub);
+
+            stmt.execute();
+            response.msg = "Transaction was successful!";
+        }
+        catch (SQLException e){
+            if(e.getMessage().contains("ORA-01403")){
+                response.msg = "CNP doesn't exist in the database!";
+            }
+            else {
+                System.err.println("Unforeseen exception: " + e.getMessage());
+            }
+        }
+        finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (Exception e){
+                System.err.println("ERROR: Closing statement/result query!");
+            }
+        }
+
+        return response;
     }
 
     private String prepareStrForQuery(String str){

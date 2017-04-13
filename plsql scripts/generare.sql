@@ -64,6 +64,10 @@ CREATE TABLE TRASEE_ABONAMENT(ID_CLIENT NUMBER(10, 0),
                               ID_TRASEU NUMBER(10, 0),
                               CONSTRAINT fk_client_ab FOREIGN KEY(id_client) REFERENCES clienti(id),
                               CONSTRAINT fk_traseu_ab FOREIGN KEY(id_traseu) REFERENCES trasee(id));
+
+-- Indecsi
+DROP INDEX idx_tranzactii_persoane;
+CREATE INDEX idx_tranzactii_persoane ON TRANZACTII(ID_CLIENT);
                               
 -- Populare tabela abonamente
 INSERT INTO abonamente (id, pret, tip) VALUES (-1, 0, 'Fara abonament');

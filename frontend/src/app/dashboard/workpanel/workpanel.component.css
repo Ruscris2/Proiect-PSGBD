@@ -116,6 +116,18 @@ input{
 	margin-bottom: 15px;
 }
 
+select{
+	position: absolute;
+	margin-left: 200px;
+	margin-bottom: 15px;
+	width: 175px;
+}
+
+.sub_price{
+	position: absolute;
+	margin-left: 200px;
+}
+
 #filterTextBox{
 	margin: 0;
 	margin-top: 8px;
@@ -223,4 +235,15 @@ thead{
 .page_btn p{
 	margin: 0;
 	padding: 0;
+}
+
+.tpoint_container{
+	display: table;
+	margin: 0 auto;
+	margin-top: 20px;
+}
+
+.make_trans_container{
+	margin-left: 25px;
+	margin-top: 25px;
 }

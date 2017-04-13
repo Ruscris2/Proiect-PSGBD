@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
-import {BackendService} from "../../backend.service";
+import { BackendService } from "../../backend.service";
+import { Cookie } from 'ng2-cookies/ng2-cookies';
 
 @Component({
-  selector: 'app-workpanel',
-  templateUrl: './workpanel.component.html',
-  styleUrls: ['./workpanel.component.css']
+	selector: 'app-workpanel',
+	templateUrl: './workpanel.component.html',
+	styleUrls: ['./workpanel.component.css'],
 })
 export class WorkpanelComponent {
 	sidebarItems = [
 		{ name: 'Clients', selected: true },
-		{ name: 'Subscription Manager', selected: false },
-		{ name: 'Third item here', selected: false },
-		{ name: 'Fourth item here', selected: false }
+		{ name: 'Make Transaction', selected: false },
+		{ name: 'Transaction Points', selected: false }
 	];
 
 	clientListPage: any = [];
+	tpoints: any = [];
+	subtypes: any = [ { id: 1, price: 0, name: ''} ];
 
 	clientpagenumber = 1;
 	selectedItem = 0;
@@ -46,9 +48,16 @@ export class WorkpanelComponent {
 	updateClientLastName: string;
 	updateClientEmail: string;
 
+	// Make transaction elements
+	currentDate: any;
+	selectedSubscription = -1;
+	display_price: number = 0;
+	transactionCNP: string = '';
+
 	constructor(private backendService: BackendService) {
 		this.currentFilter = '';
 		this.getClientPage();
+		this.currentDate = new Date();
 	}
 
 	onHeadingClick(index){
@@ -58,6 +67,11 @@ export class WorkpanelComponent {
 		this.sidebarItems[this.selectedItem].selected = false;
 		this.selectedItem = index;
 		this.sidebarItems[this.selectedItem].selected = true;
+
+		if(this.selectedItem == 1)
+			this.getSubTypes();
+		if(this.selectedItem == 2)
+			this.getTPoints();
 	}
 
 	onAddClientPageClick(){
@@ -97,6 +111,15 @@ export class WorkpanelComponent {
 		}
 	}
 
+	onSelectSubChange(event: any){
+		for(let sub_entry of this.subtypes){
+			if(sub_entry.id == event.target.value) {
+				this.display_price = sub_entry.price;
+				break;
+			}
+		}
+	}
+
 	onRegisterClick(){
 		if(this.addClientFirstName == '' || this.addClientLastName == '' || this.addClientCNP == '' || this.addClientEmail == ''){
 			alert('One or more fields are empty!');
@@ -128,6 +151,29 @@ export class WorkpanelComponent {
 		this.getClientPage();
 	}
 
+	onMakeTransactionClick(){
+		if(this.transactionCNP == ''){
+			alert('Client CNP is blank!');
+			return;
+		}
+
+		// Get user id
+		var username = Cookie.get('sessionId');
+		var userid;
+		this.backendService.getUserInfo(username).subscribe(
+			data => { let jsonParsed = JSON.parse(JSON.stringify(data));
+						userid = jsonParsed.id;
+
+				// Make the transaction
+				this.backendService.makeTransaction(this.transactionCNP, userid, this.selectedSubscription).subscribe(
+					data => { let jsonParsed = JSON.parse(JSON.stringify(data));
+						alert(jsonParsed.msg) },
+					error => console.log('Error during transaction!')
+				);},
+			error => console.log('Error getting user id from transaction!')
+		);
+	}
+
 	onRemoveBtnClick(){
 		if(this.removeClientCNP == ''){
 			alert('Fill the CNP textbox first!');
@@ -139,7 +185,7 @@ export class WorkpanelComponent {
 						alert('There is no client with that CNP!');
 					} else{
 						this.display_client = true;
-						let jsonParsed = JSON.parse(JSON.stringify(res.json()))
+						let jsonParsed = JSON.parse(JSON.stringify(res.json()));
 						this.removeClientId = jsonParsed.id;
 						this.removeClientFirstName = jsonParsed.firstname;
 						this.removeClientLastName = jsonParsed.lastname;
@@ -203,6 +249,20 @@ export class WorkpanelComponent {
 		this.backendService.getClientListPage(this.clientpagenumber, 10, this.currentFilter).subscribe(
 			data => { this.clientListPage = data },
 			error => console.log('Error getting client list page!')
+		);
+	}
+
+	getTPoints(){
+		this.backendService.getTPoints().subscribe(
+			data => { this.tpoints = data },
+			error => console.log('Error getting transaction points list!')
+		);
+	}
+
+	getSubTypes(){
+		this.backendService.getSubTypes().subscribe(
+			data => { this.subtypes = data },
+			error => console.log('Error getting subscription type list!')
 		);
 	}
 

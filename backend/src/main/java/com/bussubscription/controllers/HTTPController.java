@@ -105,4 +105,31 @@ public class HTTPController {
         System.out.println("------ /updateclient ------");
         return new ResponseEntity<ClientListResponse>(HttpStatus.OK);
     }
+
+    // ---------------------------------------- /GETTPOINTS -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/gettpoints", method = RequestMethod.GET)
+    public ResponseEntity<List<TPointListResponse>> getTPoints(){
+        System.out.println("------ /gettpoints ------");
+        return new ResponseEntity<List<TPointListResponse>>(databaseService.getTPointList(), HttpStatus.OK);
+    }
+
+    // ---------------------------------------- /GETSUBTYPES -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/getsubtypes", method = RequestMethod.GET)
+    public ResponseEntity<List<SubTypeResponse>> getSubTypes(){
+        System.out.println("------ /getsubtypes ------");
+        return new ResponseEntity<List<SubTypeResponse>>(databaseService.getSubTypeList(), HttpStatus.OK);
+    }
+
+    // ---------------------------------------- /maketransaction -------------------------------------------------
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/maketransaction", method = RequestMethod.POST)
+    public ResponseEntity<GenericResponse> makeTransaction(@RequestBody TransactionRequest request){
+
+        GenericResponse response = databaseService.makeTransaction(request.cnp, request.iduser, request.idsub);
+
+        System.out.println("------ /maketransaction ------");
+        return new ResponseEntity<GenericResponse>(response, HttpStatus.OK);
+    }
 }

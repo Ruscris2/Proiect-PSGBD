@@ -126,4 +126,49 @@
 			</div>
 		</div>
 	</div>
+	<!-- =============================================Transaction Points====================================================== -->
+	<div *ngIf="selectedItem == 1">
+		<div class="make_trans_container">
+			<div class="display_flex">
+				<p>CNP Client:</p>
+				<input [(ngModel)]="transactionCNP" type="text">
+			</div>
+			<div class="display_flex">
+				<p>Tip abonament:</p>
+				<select [(ngModel)]="selectedSubscription" (change)="onSelectSubChange($event)">
+					<option *ngFor="let sub_entry of subtypes" value="{{sub_entry.id}}">{{sub_entry.name}}</option>
+				</select>
+			</div>
+			<div class="display_flex">
+				<p>Pret abonament:</p><p class="sub_price">{{display_price}} lei</p>
+			</div>
+			<div class="display_flex">
+				<p>Data curenta:</p><p class="sub_price">{{currentDate}}</p>
+			</div>
+			<div class="display_flex">
+				<div class="btn" (click)="onMakeTransactionClick()"><p>Make transaction</p></div>
+			</div>
+		</div>
+	</div>
+	<!-- =============================================Transaction Points====================================================== -->
+	<div *ngIf="selectedItem == 2">
+		<div class="tpoint_container">
+			<table>
+				<thead>
+					<tr>
+						<td>ID</td>
+						<td>Adresa</td>
+						<td>Oras</td>
+						<td>Cel mai bun client</td>
+					</tr>
+				</thead>
+				<tr *ngFor="let point_entry of tpoints">
+					<td>{{point_entry.id}}</td>
+					<td>{{point_entry.address}}</td>
+					<td>{{point_entry.city}}</td>
+					<td>{{point_entry.bestclient}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </div>

@@ -1,56 +1,117 @@
-set serveroutput on;
-
-CREATE OR REPLACE PACKAGE bus_app_pack AS
-    TYPE Statistica IS RECORD(nume abonamente.tip%TYPE, procent NUMBER);
-    TYPE RaspunsStatisticaAbonamente IS TABLE OF Statistica INDEX BY PLS_INTEGER;
-    PROCEDURE statistica_abonamente(p_statistica_abonamente OUT RaspunsStatisticaAbonamente);
-END bus_app_pack;
+CREATE OR REPLACE PACKAGE project_functions IS
+  TYPE spent_sums_type IS TABLE OF NUMBER INDEX BY VARCHAR2(32) ;
+  FUNCTION best_client(v_id_ghiseu IN VARCHAR2) RETURN VARCHAR;
+END ;
 /
-
-CREATE OR REPLACE PACKAGE BODY bus_app_pack AS
-    PROCEDURE statistica_abonamente(p_statistica_abonamente OUT RaspunsStatisticaAbonamente) IS
-        CURSOR lista_clienti IS SELECT abonament_activ, inceput_abonament, sfarsit_abonament FROM clienti;
-        v_tip_abonament clienti.abonament_activ%TYPE;
-        v_data_inceput clienti.inceput_abonament%TYPE;
-        v_data_sfarsit clienti.sfarsit_abonament%TYPE;
-        v_nr_abonamente_active int;
-        v_nume_abonament abonamente.tip%TYPE;
-    BEGIN
-        OPEN lista_clienti;
-        
-        v_nr_abonamente_active := 0;
-        
-        LOOP
-            FETCH lista_clienti INTO v_tip_abonament, v_data_inceput, v_data_sfarsit;
-            EXIT WHEN lista_clienti%NOTFOUND;
-            
-            IF v_tip_abonament != -1 THEN
-                IF p_statistica_abonamente.exists(v_tip_abonament) THEN
-                    p_statistica_abonamente(v_tip_abonament).procent := p_statistica_abonamente(v_tip_abonament).procent + 1;
-                ELSE
-                    p_statistica_abonamente(v_tip_abonament).procent := 1;
-                END IF;
-            END IF;
-            v_nr_abonamente_active := v_nr_abonamente_active + 1;
-        END LOOP;
-        
-        CLOSE lista_clienti;
-        
-        FOR v_i IN p_statistica_abonamente.first .. p_statistica_abonamente.last LOOP
-            SELECT tip INTO v_nume_abonament FROM abonamente WHERE id = v_i;
-            p_statistica_abonamente(v_i).nume := v_nume_abonament;
-            p_statistica_abonamente(v_i).procent := p_statistica_abonamente(v_i).procent / v_nr_abonamente_active * 100;
-        END LOOP;
-    END;
-END bus_app_pack;
-/
-
--- TEST AREA --
-DECLARE
-    stat bus_app_pack.RaspunsStatisticaAbonamente;
-BEGIN
-    bus_app_pack.statistica_abonamente(stat);
-    FOR v_i IN stat.first..stat.last LOOP
-        DBMS_OUTPUT.PUT_LINE('Abonament: ' || stat(v_i).nume || ' Procent: ' || TO_CHAR(stat(v_i).procent) || '%');
+CREATE OR REPLACE PACKAGE BODY project_functions AS
+  FUNCTION best_client (v_id_ghiseu IN VARCHAR2)
+    RETURN VARCHAR AS
+    v_best_client VARCHAR(64);
+    v_spent_sums spent_sums_type;
+    CURSOR clients_cursor IS SELECT id FROM CLIENTI;
+    v_id_client CLIENTI.ID%TYPE ;
+    v_spent_sum NUMBER;
+    v_maxim_spent_sum NUMBER;
+    v_maxim_spent_sum_index NUMBER;
+    v_index varchar2(32);
+  BEGIN
+    v_maxim_spent_sum := 0;
+    v_best_client := 'test';
+    OPEN clients_cursor;
+    /*
+    pun toate sumele cheltuite de clientii unui anumit ghiseu
+    intr-un associative array
+     */
+    LOOP
+      FETCH clients_cursor INTO v_id_client;
+      EXIT WHEN clients_cursor%NOTFOUND;
+      /*
+      pun in v_spent_sum suma cheltuielilor clientilor
+      cu id_ul v_id_client in ulimele 12 luni
+      SELECT sum(a.pret) FROM
+        TRANZACTII t JOIN ABONAMENTE a ON t.ID_ABONAMENT = a.ID
+        JOIN ANGAJATI ang ON ang.ID = t.ID_ANGAJAT
+      WHERE t.ID_CLIENT = 1049 AND ang.ID_GHISEU = 1
+      AND add_months(t.DATA_TRANZACTIE, 12) >= sysdate;
+      */
+      SELECT sum(a.PRET) INTO v_spent_sum FROM
+        TRANZACTII t JOIN ANGAJATI ang ON ang.ID = t.ID_ANGAJAT
+        JOIN ABONAMENTE a ON t.ID_ABONAMENT = a.ID
+      WHERE ang.ID_GHISEU = v_id_ghiseu AND t.ID_CLIENT = v_id_client
+      AND add_months(t.DATA_TRANZACTIE, 12) >= sysdate;
+      v_spent_sums(v_id_client) := v_spent_sum;
     END LOOP;
-END;
+    /*
+    scot maximul din associative array-ul construit
+     */
+    v_index := v_spent_sums.FIRST;
+    WHILE (v_index IS NOT NULL )
+    LOOP
+
+      if(v_spent_sums(v_index) > v_maxim_spent_sum) THEN
+        v_maxim_spent_sum := v_spent_sums(v_index);
+        v_maxim_spent_sum_index := to_char(v_index);
+      END IF;
+      v_index := v_spent_sums.NEXT(v_index);
+    END LOOP;
+    /*
+    pentru id-ul aflat mai sus scot numele si prenumele clientului
+     */
+    SELECT CLIENTI.NUME||' '||CLIENTI.PRENUME INTO v_best_client FROM CLIENTI
+      WHERE ID = v_maxim_spent_sum_index;
+    RETURN v_best_client;
+    EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+      RETURN 'Nobody';
+    RAISE ;
+  END;
+END project_functions;
+/
+
+-- ================================= CLIENT PACK =================================
+CREATE OR REPLACE PACKAGE client_pack AS
+    PROCEDURE update_client(p_firstname IN VARCHAR2, p_lastname IN VARCHAR2, p_cnp IN VARCHAR2, p_email IN VARCHAR2);
+    PROCEDURE remove_client(p_cnp IN VARCHAR2);
+END client_pack;
+/
+
+CREATE OR REPLACE PACKAGE BODY client_pack AS
+    PROCEDURE update_client(p_firstname IN VARCHAR2, p_lastname IN VARCHAR2, p_cnp IN VARCHAR2, p_email IN VARCHAR2) IS
+    BEGIN
+        UPDATE clienti SET nume = p_firstname, prenume = p_lastname, email = p_email WHERE cnp = p_cnp;
+    END;
+    
+    PROCEDURE remove_client(p_cnp IN VARCHAR2) IS
+    BEGIN
+        DELETE FROM clienti WHERE cnp = p_cnp;
+    END;
+END client_pack;
+/
+
+-- ================================= TRANSACTION PACK =================================
+CREATE OR REPLACE PACKAGE transaction_pack AS
+    PROCEDURE make_transaction(p_cnp IN VARCHAR2, p_id_angajat IN NUMBER, p_id_abonament IN NUMBER);
+END transaction_pack;
+/
+
+CREATE OR REPLACE PACKAGE BODY transaction_pack AS
+    PROCEDURE make_transaction(p_cnp IN VARCHAR2, p_id_angajat IN NUMBER, p_id_abonament IN NUMBER) IS
+        v_id_client int;
+        v_id_tranzactie int;
+    BEGIN
+        -- Obtinere id client
+        SELECT id INTO v_id_client FROM clienti WHERE cnp = p_cnp;
+        
+        -- Obtinere id tranzactie noua
+        SELECT COUNT(*)+1 INTO v_id_tranzactie FROM tranzactii;
+        
+        -- Creeare tranzactie
+        INSERT INTO tranzactii (id, id_client, id_angajat, id_abonament, data_tranzactie)
+                VALUES (v_id_tranzactie, v_id_client, p_id_angajat, p_id_abonament, SYSDATE);
+                
+        -- Modificare abonament client
+        UPDATE clienti SET abonament_activ = p_id_abonament, inceput_abonament = SYSDATE,
+                sfarsit_abonament = SYSDATE+30 WHERE cnp = p_cnp;
+    END;
+END transaction_pack;

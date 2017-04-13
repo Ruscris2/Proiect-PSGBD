@@ -1,8 +1,6 @@
 package com.bussubscription.services;
 
-import com.bussubscription.models.ClientListResponse;
-import com.bussubscription.models.GenericResponse;
-import com.bussubscription.models.UserinfoResponse;
+import com.bussubscription.models.*;
 
 import java.util.List;
 
@@ -14,4 +12,7 @@ public interface DatabaseService {
     ClientListResponse getClient(String cnp);
     boolean removeClient(String cnp);
     boolean updateClient(String firstname, String lastname, String cnp, String email);
+    List<TPointListResponse> getTPointList();
+    List<SubTypeResponse> getSubTypeList();
+    GenericResponse makeTransaction(String cnp, int idUser, int idSub);
 }
